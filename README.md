@@ -109,12 +109,29 @@ pas le fichier MSX dans le checkout.
 
 ## Compiler
 
+Le code du portage est en C99, compile avec **GCC pour Motorola 68000**
+(`m68k-elf-gcc`). Le Makefile fixe explicitement `-std=c99`.
+GCC natif (x86/ARM) permet de tester les primitives du personnage ; la ROM
+Mega Drive utilise le compilateur croise et les bibliotheques SGDK.
+
 Avec une installation SGDK 2.11 fonctionnelle et sa chaine m68k-elf :
 
 ```sh
 cd sgdk
 make GDK=/chemin/vers/sgdk
 ```
+
+Pour reproduire le controle GCC avec les avertissements traites en erreurs :
+
+```sh
+make GDK=/chemin/vers/sgdk clean
+make GDK=/chemin/vers/sgdk EXTRA_FLAGS='-std=c99 -Werror'
+```
+
+Validation : compilation complete GCC m68k-elf 13.1.0 / SGDK 2.11 en C99
+avec `-Wall -Wextra -Werror`, et primitives compilees avec GCC natif 13.3.0
+en `-std=c99 -pedantic-errors -Wall -Wextra -Werror`. Les 53 872 comparaisons
+C/Z80 passent ; la ROM obtenue est identique au binaire du jalon 4.
 
 La sortie est `sgdk/out/rom.bin`. Sous Windows, on peut employer le makefile
 de l'installation SGDK avec les outils fournis dans `bin/`.
