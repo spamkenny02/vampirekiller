@@ -3,3 +3,4 @@ sgdk/out/
 __pycache__/
 *.pyc
 assets/rooms/
+build/cache/

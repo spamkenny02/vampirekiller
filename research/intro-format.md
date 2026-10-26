@@ -115,6 +115,16 @@ a porter.
 
 ## Verification
 
+BASELINE-01 ajoute une reference independante : le jeu entier demarre dans
+openMSX 19.1 avec C-BIOS_MSX2, VDP et interruptions, sans remplacement de
+routine. `capture_msx_startup.py` observe les retours de routines et exporte
+les donnees VDP et RAM. `verify_msx_startup.py` confirme quatre fonds et
+leurs palettes, 319 mises a jour consecutives de sprites et les 768 octets
+de la carte de depart. Le titre sans entree est egalement trace jusqu'a la
+demonstration. Les differences temporelles et les limites figurent dans
+`PROJECT_STATUS.md`. Les vues VRAM de cette reference ne sont pas des captures
+natives du framebuffer de l'emulateur.
+
 `verify_intro.py` controle les etats en RAM de la ROM MD et pilote tout le
 parcours depuis le titre jusqu'au hall. Il compare les pixels du logo, du
 titre (hors invite adaptee), de trois images animees devant la grille, de la

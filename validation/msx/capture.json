@@ -1,0 +1,20 @@
+{
+  "emulator": "openMSX 19.1",
+  "machine": "C-BIOS_MSX2",
+  "emulator_sha256": "bb6854d9a7f51c6d0766644537ecaf39faf97de683c5d53a132215a6b0c552de",
+  "source_rom_sha256": "99eabaaeb2b6c02220e131043d5a6401d0d8c5f413d89204547adcc04d65e7e2",
+  "bios_sha256": {
+    "cbios_main_msx2.rom": "8767fca1a1ca5928496bb6185a0e951c66d68f65361305134a25f7912085766b",
+    "cbios_logo_msx2.rom": "a6ecf0bee1d1aeae4a2df4ace1d711b8c5883cbed50f7d6c8c524f6b19f03ef4",
+    "cbios_sub.rom": "95db258195d1dea673b3826a8ef3d4b747f87f93587ae66e137acd2e39c3c0f1"
+  },
+  "input": "SPACE down/up 0.2/0.4 emulated seconds after first title draw",
+  "intro_updates": 319,
+  "scenarios": [
+    "SPACE starts the game from the title",
+    "No input reaches the automatic demo"
+  ],
+  "ram_range": "C000-FFFF only; mapped cartridge and BIOS ROM excluded",
+  "scope": "Full ROM, CPU, C-BIOS, V9938 and interrupts; read-only breakpoints, no patches.",
+  "images": "VRAM snapshots, not native emulator framebuffer screenshots"
+}

@@ -1,0 +1,13 @@
+{
+  "all_passed": true,
+  "checks": [
+    "two clean GCC builds",
+    "full-ROM MSX startup reference",
+    "153 Z80 maps",
+    "53872 C/Z80 primitive comparisons",
+    "MD startup flow and pixels",
+    "MD movement",
+    "152 MD backgrounds"
+  ],
+  "startup_status": "Graphics validated; documented timing adaptations; silent port"
+}

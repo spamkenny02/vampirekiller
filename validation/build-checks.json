@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "sgdk": "2.11",
+  "gcc": "13.1.0",
+  "extra_flags": "-std=c99 -Werror",
+  "clean_builds": 2,
+  "rom_sha256": "b64a49f4168a0d251a91b730a834f95c922032362ef12d31ccaaabac9c9a00b4",
+  "rom_size": 524288,
+  "reproducible": true,
+  "sgdk_xor16": 0,
+  "library_mode": "native fat objects; LTO sections removed from a local copy"
+}

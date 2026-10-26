@@ -1,5 +1,11 @@
 # Vampire Killer MSX2 → Mega Drive / SGDK
 
+**BASELINE-01 : compilation reproductible et donnees graphiques du demarrage
+validees contre une execution complete openMSX/C-BIOS.** Voir
+[BUILDING.md](BUILDING.md) pour compiler/verifier et
+[PROJECT_STATUS.md](PROJECT_STATUS.md) pour les criteres de sortie,
+les adaptations de duree et les limites. Le portage reste muet.
+
 Jalon 4, 26 octobre 2026 : **le demarrage enchaine le logo Konami, le titre,
 la scene animee devant la grille, les trois ecrans jouables de la cour et
 l'entree dans le hall du chateau.** Simon marche et saute avec les graphismes
@@ -173,8 +179,10 @@ python3 tools/verify_viewer.py /chemin/genesis_plus_gx_libretro.so \
 ```
 
 La verification couvre le rendu MD par rapport a l'extraction. L'execution de
-la routine Z80 valide separement les cartes. Aucune execution complete MSX2
-avec BIOS, VDP et interruptions n'a encore ete comparee a ce portage.
+la routine Z80 valide separement les cartes. Le demarrage est aussi compare
+aux donnees d'une execution complete openMSX 19.1 / C-BIOS_MSX2, avec VDP et
+interruptions : quatre fonds, palettes et 319 mises a jour de sprites.
+Cette validation ne couvre pas encore une partie complete ou un BIOS constructeur.
 
 Pour verifier les primitives du personnage avec un compilateur C natif :
 

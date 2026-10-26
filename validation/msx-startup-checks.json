@@ -1,0 +1,229 @@
+{
+  "all_passed": true,
+  "reference": "openMSX 19.1 / C-BIOS_MSX2",
+  "reference_zip_sha256": "78b580af4c4acb4eabf05962e7b69006190f92f967d791f7d515665cc5304cb0",
+  "source_rom_sha256": "99eabaaeb2b6c02220e131043d5a6401d0d8c5f413d89204547adcc04d65e7e2",
+  "backgrounds": [
+    {
+      "scene": "logo",
+      "background_bytes_equal": 27136,
+      "used_palette_entries_equal": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "scene": "title",
+      "background_bytes_equal": 27136,
+      "used_palette_entries_equal": [
+        0,
+        2,
+        8,
+        12,
+        14,
+        15
+      ]
+    },
+    {
+      "scene": "castle",
+      "background_bytes_equal": 27136,
+      "used_palette_entries_equal": [
+        0,
+        1,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ]
+    },
+    {
+      "scene": "courtyard",
+      "background_bytes_equal": 27136,
+      "used_palette_entries_equal": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  ],
+  "intro_updates_equal": 319,
+  "intro_groups_per_update": 8,
+  "courtyard_collision_bytes_equal": 768,
+  "state_trace": [
+    {
+      "time": "4.071399577320581",
+      "state": "0",
+      "substate": "0",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "4.304766946637073",
+      "state": "0",
+      "substate": "1",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "5.9402074844707915",
+      "state": "0",
+      "substate": "2",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "10.713019950859676",
+      "state": "1",
+      "substate": "0",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "10.930204816533944",
+      "state": "3",
+      "substate": "0",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "10.949035980829965",
+      "state": "3",
+      "substate": "1",
+      "timer": "80",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "12.28223363583919",
+      "state": "3",
+      "substate": "2",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "12.349907041258037",
+      "state": "3",
+      "substate": "3",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "12.916324840168233",
+      "state": "3",
+      "substate": "4",
+      "timer": "160",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "18.65681839451662",
+      "state": "4",
+      "substate": "0",
+      "timer": "32",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    }
+  ],
+  "unattended_demo_trace": [
+    {
+      "time": "4.071399577320581",
+      "state": "0",
+      "substate": "0",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "4.304766946637073",
+      "state": "0",
+      "substate": "1",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "5.9402074844707915",
+      "state": "0",
+      "substate": "2",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "10.713019950859676",
+      "state": "1",
+      "substate": "0",
+      "timer": "0",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "14.985186664785608",
+      "state": "2",
+      "substate": "0",
+      "timer": "32",
+      "stage": "0",
+      "room": "0",
+      "display": "98"
+    },
+    {
+      "time": "16.069959729518697",
+      "state": "2",
+      "substate": "1",
+      "timer": "32",
+      "stage": "1",
+      "room": "0",
+      "display": "98"
+    }
+  ],
+  "first_intro_update_time": 12.925988917585894,
+  "last_intro_update_time": 18.23243456919804,
+  "scope": "Full-ROM emulation data vs extraction, then separate MD pixel checks.",
+  "limits": [
+    "C-BIOS, not a manufacturer BIOS or physical MSX2",
+    "VRAM previews, not native emulator screenshots",
+    "Mega Drive logo timing, title wait and intro skip are adaptations",
+    "Mega Drive sound is not implemented"
+  ]
+}

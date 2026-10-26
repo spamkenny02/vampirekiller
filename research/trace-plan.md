@@ -2,9 +2,13 @@
 
 Plan du premier jalon. Au jalon 2, la routine de carte 4F83/4FAF a ete testee
 separement sur CPU Z80 et un explorateur de fonds tourne sur Mega Drive.
-La trace complete MSX2 decrite ci-dessous reste a effectuer.
+Ce document conserve le plan initial et indique ci-dessous la partie executee.
 
-Ce plan n'a pas encore ete execute. Aucun journal d'emulation n'est fourni.
+Mise a jour BASELINE-01 : la trace complete du demarrage est maintenant
+executee dans openMSX 19.1 / C-BIOS_MSX2. Les journaux, etats RAM et VRAM sont
+dans `validation/msx/startup-reference.zip`, avec une verification dans
+`validation/msx-startup-checks.json`. Les observations du reste du jeu
+listees ci-dessous restent a effectuer.
 Utiliser une machine MSX2 et les BIOS appropries dans un emulateur disposant
 d'un debogueur. Les adresses ci-dessous sont des adresses CPU, sauf mention
 explicite d'un offset physique. Filtrer les arrets sur le slot de la cartouche.
