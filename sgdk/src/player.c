@@ -55,7 +55,8 @@ void vk_player_reset(VKPlayer *p)
 
 /* Prototype orchestration around the ported primitives, limited to room 1/0.
  * It does not implement the full original state dispatcher, stairs or exits. */
-void vk_player_tick(VKPlayer *p, int direction, int jump_pressed)
+void vk_player_tick_map(VKPlayer *p, const VKByte *map, VKByte stage,
+                        int direction, int jump_pressed)
 {
     VKByte was_jumping = p->mode == 1;
     VKByte walking = 0;
@@ -63,7 +64,7 @@ void vk_player_tick(VKPlayer *p, int direction, int jump_pressed)
     if (direction)
     {
         p->facing = direction < 0;
-        if (!vk_wall(vk_player_room, p->x, p->y, direction, 0, 1, 0))
+        if (!vk_wall(map, p->x, p->y, direction, 0, stage, 0))
         {
             int next = p->x + direction * 2; /* Original normal speed: 0200 in 8.8. */
             if (next >= 8 && next <= 248) { p->x = (VKByte) next; walking = 1; }
@@ -71,26 +72,31 @@ void vk_player_tick(VKPlayer *p, int direction, int jump_pressed)
     }
     if (p->mode == 0)
     {
-        if (!vk_grounded(vk_player_room, p->x, p->y, 1, 0)) { p->mode = 4; p->phase = 0; }
+        if (!vk_grounded(map, p->x, p->y, stage, 0)) { p->mode = 4; p->phase = 0; }
         else if (jump_pressed) { p->mode = 1; p->phase = 0; }
     }
     if (p->mode == 1 && was_jumping)
     {
         vk_jump_step(&p->y, &p->phase);
-        if (p->phase >= 9 && vk_grounded(vk_player_room, p->x, p->y, 1, 0))
+        if (p->phase >= 9 && vk_grounded(map, p->x, p->y, stage, 0))
         { p->y &= 248; p->mode = p->phase = 0; }
     }
     else if (p->mode == 4)
     {
-        if (vk_grounded(vk_player_room, p->x, p->y, 1, 0))
+        if (vk_grounded(map, p->x, p->y, stage, 0))
         { p->y &= 248; p->mode = p->phase = 0; }
         else { p->y = (VKByte)(p->y + vk_fall_deltas[p->phase]); if (p->phase < 3) p->phase++; }
     }
-    if (p->y >= 208) vk_player_reset(p); /* Room-only boundary handling. */
+    if (p->y >= 208) { vk_player_reset(p); if (stage == 0) p->y = 176; }
     if (p->mode == 1) p->pose = p->facing ? 7 : 6;
     else
     {
         VKByte frame = walking ? ((p->clock & 4) ? 1 : ((p->clock & 8) ? 0 : 2)) : 0;
         p->pose = frame + (p->facing ? 3 : 0);
     }
+}
+
+void vk_player_tick(VKPlayer *p, int direction, int jump_pressed)
+{
+    vk_player_tick_map(p, vk_player_room, 1, direction, jump_pressed);
 }

@@ -1,32 +1,37 @@
 # Vampire Killer MSX2 → Mega Drive / SGDK
 
-Jalon 3, 26 octobre 2026 : **Simon peut marcher et sauter dans la premiere salle
-sur Mega Drive.** La ROM conserve aussi l'explorateur de 152 fonds sur 18 stages.
-Les sondes de collision et l'increment de saut portes en C ont ete compares
-a l'execution du code Z80 original dans 53 080 cas.
+Jalon 4, 26 octobre 2026 : **le demarrage enchaine le logo Konami, le titre,
+la scene animee devant la grille, les trois ecrans jouables de la cour et
+l'entree dans le hall du chateau.** Simon marche et saute avec les graphismes
+extraits de la ROM. L'explorateur de 152 fonds reste disponible.
 
-Le mode personnage est un prototype limite a la salle 1/0 : graphismes
-d'origine, primitives traduites et controleur encore simplifie. Attaques,
-escaliers, sorties, objets, ennemis et son restent a implementer.
+Les attaques, les ennemis, le son et les escaliers ne sont pas encore portes.
+Les flammes des nouveaux decors sont statiques et ne blessent pas Simon.
+Le controleur et l'activation de la porte sont encore simplifies.
 
 ## Essayer
 
 Ouvrir `build/vampire-killer-md-viewer.bin` dans un emulateur Mega Drive.
-La ROM demarre directement dans le decor du stage 1, salle 0.
 
-| Commande | Action |
+| Situation | Commande |
 | --- | --- |
-| Gauche / droite | Salle precedente / suivante, avec retour en boucle |
-| Haut / bas | Stage suivant / precedent, avec retour en boucle |
-| A | Basculer entre la salle et les 192 emplacements de tuiles |
-| START | Revenir au stage 1, salle 0 |
-| B | Entrer dans le mode personnage de la premiere salle / quitter ce mode |
+| Logo Konami | Attendre le titre ou START pour le passer |
+| Titre | START lance l'entree devant le chateau |
+| Scene animee de la grille | Attendre la fin ou START pour la passer |
+| Cour exterieure | Gauche / droite pour marcher, C pour sauter |
+| Bord d'un ecran de la cour | Continuer a marcher pour changer d'ecran |
+| Porte du chateau, troisieme ecran | Se placer devant et appuyer sur HAUT |
+| Partie | START revient au titre |
 
-Dans le mode personnage : gauche/droite deplace Simon, **C** declenche un saut,
-START reinitialise sa position et B revient a l'explorateur.
+La cour constitue le stage 0 du jeu original, avec un depart a x=16,y=176.
+Le prototype precedent commencait plus loin, dans le hall (stage 1).
+Le nouveau parcours corrige cet ordre. Le HUD d'origine est conserve dans
+les nouvelles scenes, avec un guide de commandes dans la marge inferieure.
 
-Les numeros de salles commencent a zero. Le texte de diagnostic remplace le HUD
-original. Le programme n'execute pas le jeu MSX complet.
+Depuis le titre, A ouvre l'explorateur technique : gauche/droite change de
+salle, haut/bas change de stage, A montre les tuiles et B ouvre l'ancien test
+du personnage dans le hall. Dans ce test, C saute, B revient a l'explorateur
+et START reinitialise Simon.
 
 ## Resultats verifies
 
@@ -37,14 +42,22 @@ original. Le programme n'execute pas le jeu MSX complet.
 - Pour les 152 fonds, comparaison pixel par pixel dans Genesis Plus GX avec la
   reconstruction attendue : **45 056 pixels identiques par fond**, soit 6 848 512 au total.
 - Navigation entre salles et stages, bascule vers l'atlas et remise a zero testees.
-- Compilation SGDK 2.11 / GCC m68k-elf 13.1.0 sans avertissement; ROM de 393216 octets.
+- Compilation SGDK 2.11 / GCC m68k-elf 13.1.0 sans avertissement; ROM de 524288 octets.
 - Signature SEGA, alignement et checksum au format SGDK controles.
-- 53 080 comparaisons C/Z80 : classification, adressage de carte, sondes
+- 53 872 comparaisons C/Z80 : classification, adressage de carte, sondes
   au sol et laterales, calcul du saut.
 - Huit poses de Simon extraites des masques RLE et des tables de placement.
 - Test MD : 60 pixels en 30 images a droite, 20 pixels en 10 images a gauche,
   saut et retour au sol. Cinq captures correspondent pixel par pixel aux
   masques originaux composes sur le decor.
+
+- Sept nouvelles scenes reconstruites en executant les routines originales
+  avec des adaptateurs BIOS/VDP explicites.
+- 320 images de trajectoires originales pour le nuage, les chauves-souris
+  et Simon dans l'intro, avec seulement 14 motifs de sprites distincts.
+- Parcours complet titre → intro → cour 0 → cour 1 → cour 2 → hall verifie
+  dans Genesis Plus GX; logo, titre, trois instants animes et scenes jouables
+  compares pixel par pixel aux references reconstruites.
 
 La derniere entree, stage 18 / salle 9, utilise des identifiants de tuiles
 192 a 245 qui ne sont pas couverts par le chargement standard identifie.
@@ -58,6 +71,9 @@ statiques sans les modifications du jeu en cours d'execution.
 | --- | --- |
 | `build/vampire-killer-md-viewer.bin` | ROM Mega Drive prete a essayer |
 | `validation/md-stage-01-room-00.png` | Capture reelle de la ROM dans Genesis Plus GX |
+| `validation/md-castle-entry.png` | Scene animee de la grille dans la ROM MD |
+| `validation/md-castle-door.png` | Simon devant la porte accessible dans la cour |
+| `research/intro-format.md` | Routines de demarrage, reconstruction et adaptations |
 | `validation/md-player-jump.png` | Simon en plein saut dans la premiere salle |
 | `research/player-format.md` | Sprite, collisions, saut et limites du prototype |
 | `assets/stage-overview.png` | Apercu reconstruit des 18 premiers fonds de stages |
@@ -79,6 +95,7 @@ python3 -m pip install -r requirements.txt
 python3 tools/probe.py "/chemin/Vampire Killer (Japan, Europe).zip"
 python3 tools/extract_rooms.py "/chemin/Vampire Killer (Japan, Europe).zip"
 python3 tools/extract_player.py "/chemin/Vampire Killer (Japan, Europe).zip"
+python3 tools/extract_intro.py "/chemin/Vampire Killer (Japan, Europe).zip"
 python3 tools/disassemble_regions.py "/chemin/Vampire Killer (Japan, Europe).zip"
 python3 tools/verify_z80_maps.py "/chemin/Vampire Killer (Japan, Europe).zip"
 ```
@@ -139,9 +156,11 @@ python3 tools/verify_player_primitives.py \
   "/chemin/Vampire Killer (Japan, Europe).zip" /tmp/player.so
 python3 tools/verify_play_mode.py /chemin/genesis_plus_gx_libretro.so \
   "/chemin/Vampire Killer (Japan, Europe).zip" sgdk/out/rom.bin sgdk/out/symbol.txt
+python3 tools/verify_intro.py /chemin/genesis_plus_gx_libretro.so \
+  "/chemin/Vampire Killer (Japan, Europe).zip" sgdk/out/rom.bin sgdk/out/symbol.txt
 ```
 
 Les fichiers de demarrage SGDK conservent leur licence MIT dans
 `third_party/SGDK-LICENSE.txt`. Les emulateurs et la chaine de compilation ne sont
-pas inclus. Prochain jalon : fouet, escaliers et transitions de salles.
+pas inclus. Prochain jalon : fouet, ennemis et son, puis extension des interactions du hall.
 Depot : https://github.com/spamkenny02/vampirekiller.

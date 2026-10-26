@@ -10,7 +10,7 @@ from PIL import Image
 
 
 def run(core_path, rom_path, output, frames=180, buttons=(), observe=None,
-        script=None, memory_observer=None):
+        script=None, memory_observer=None, startup=None):
     core = C.CDLL(str(core_path.resolve()))
     state = {'format': 2, 'frame': None, 'buttons': set()}
     directory = C.create_string_buffer(str(output.parent.resolve()).encode())
@@ -107,6 +107,9 @@ def run(core_path, rom_path, output, frames=180, buttons=(), observe=None,
     core.retro_set_controller_port_device(0, 1)
     for _ in range(frames):
         core.retro_run()
+    for keys, duration in startup or ():
+        state['buttons'] = set(keys)
+        for _ in range(duration): core.retro_run()
     def capture(step):
         if observe:
             observe(to_image(), step)

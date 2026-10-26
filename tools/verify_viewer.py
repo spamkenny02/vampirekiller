@@ -53,11 +53,12 @@ def main():
             diff.save(args.out / f"difference-{step:03d}.png")
             raise AssertionError(f"Image differente: stage={room['stage']} room={room['room']}")
 
-    run(args.core, args.md_rom, args.out / 'last-room.png', buttons=buttons, observe=observe)
+    startup = [([1], 5), ([], 5)]  # A from the title opens the developer explorer.
+    run(args.core, args.md_rom, args.out / 'last-room.png', buttons=buttons, observe=observe, startup=startup)
     # Atlas toggle, stage wrap and reset are separate navigation paths.
-    run(args.core, args.md_rom, args.out / 'md-atlas.png', buttons=[1])
-    run(args.core, args.md_rom, args.out / 'md-stage-wrap.png', buttons=[5])
-    run(args.core, args.md_rom, args.out / 'md-reset.png', buttons=[7, 4, 1, 3])
+    run(args.core, args.md_rom, args.out / 'md-atlas.png', buttons=[1], startup=startup)
+    run(args.core, args.md_rom, args.out / 'md-stage-wrap.png', buttons=[5], startup=startup)
+    run(args.core, args.md_rom, args.out / 'md-reset.png', buttons=[7, 4, 1, 3], startup=startup)
     from PIL import Image
     assert Image.open(args.out / 'md-reset.png').tobytes() == Image.open(args.out / 'md-stage-01-room-00.png').tobytes()
     assert Image.open(args.out / 'md-atlas.png').tobytes() != Image.open(args.out / 'md-stage-01-room-00.png').tobytes()

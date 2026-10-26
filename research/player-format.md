@@ -1,5 +1,9 @@
 # Simon, collisions et saut — jalon 3
 
+Etat initial du jalon 3. Le jalon 4 ajoute les trois cartes exterieures aux
+comparaisons, pour un total de 53 872 cas, et un parcours avant le hall.
+Voir `intro-format.md` pour l'enchainement courant.
+
 Le mode accessible avec B permet de marcher et sauter dans la salle 1/0.
 Il combine des primitives traduites du Z80 et un controleur provisoire en C.
 Il ne reproduit pas encore le dispatch complet du personnage.

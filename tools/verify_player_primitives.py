@@ -60,16 +60,18 @@ def main():
                 checks['tile_classification'] += 1
     rng = random.Random(0x564B)
     manifest = json.loads((ROOT / 'assets/manifest.json').read_text())
-    for room in manifest['rooms']:
-        stage = room['stage']
-        tilemap = bytes(decode_room(data, stage, room['room'])[2])
+    cases = [(room['stage'], room['room'], bytes(decode_room(data, room['stage'], room['room'])[2]))
+             for room in manifest['rooms']]
+    intro = json.loads((ROOT / 'assets/intro/manifest.json').read_text())
+    cases.extend((0, room, bytes(tilemap)) for room, tilemap in enumerate(intro['courtyard_collision_maps']))
+    for stage, room_number, tilemap in cases:
         array = (Byte * 768).from_buffer_copy(tilemap)
         machine.set_memory_block(0xD100, tilemap)
         machine.memory[0xD000] = stage
         for _ in range(24):
             x, y = rng.randrange(256), rng.randrange(256)
             actual, _ = invoke(0x7D2F, d=x, e=y)
-            assert actual == native.vk_sample_tile(array, x, y), (stage, room['room'], x, y)
+            assert actual == native.vk_sample_tile(array, x, y), (stage, room_number, x, y)
             checks['coordinate_lookup'] += 1
             machine.memory[0xC427] = x
             machine.memory[0xC425] = y

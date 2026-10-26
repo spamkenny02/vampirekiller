@@ -39,7 +39,7 @@ def main():
     script = [([0], 5), ([], 5), ([7], 30), ([], 5), ([8], 5), ([], 7),
               ([], 25), ([6], 10), ([], 5)]
     run(args.core, args.md_rom, out / 'md-player-left.png', script=script,
-        memory_observer=memory, observe=image)
+        memory_observer=memory, observe=image, startup=[([1], 5), ([], 5)])
     assert (states[2]['x'], states[2]['y']) == (16, 192)
     assert (states[4]['x'], states[4]['y']) == (76, 192)
     assert states[6]['mode'] == 1 and states[6]['y'] < 192

@@ -19,7 +19,7 @@ const ROMHeader rom_header = {
 #if (ENABLE_BANK_SWITCH != 0)
     0x003FFFFF,
 #else
-    0x0005FFFF,
+    0x0007FFFF,
 #endif
     0xE0FF0000,
     0xE0FFFFFF,

@@ -17,5 +17,7 @@ int vk_wall(const VKByte *map, VKByte x, VKByte y, int direction,
 void vk_jump_step(VKByte *y, VKByte *phase);
 void vk_player_reset(VKPlayer *player);
 void vk_player_tick(VKPlayer *player, int direction, int jump_pressed);
+void vk_player_tick_map(VKPlayer *player, const VKByte *map, VKByte stage,
+                        int direction, int jump_pressed);
 
 #endif

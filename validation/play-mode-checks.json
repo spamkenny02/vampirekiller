@@ -1,6 +1,6 @@
 {
   "all_passed": true,
-  "md_rom_sha256": "9077f73544dc52186cf7ccdeb4fa7ad4f9947a61b43828f7773407bcb977c442",
+  "md_rom_sha256": "307fe1fe11b821116cdabd7bf49722716be4005494b8ecd40210fa70eb366e4a",
   "movement": {
     "right_30_frames_px": 60,
     "left_10_frames_px": 20
