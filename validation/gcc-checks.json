@@ -7,8 +7,10 @@
     "extra_flags": "-std=c99 -Werror",
     "warnings": "-Wall -Wextra (SGDK defaults)",
     "clean_build": true,
-    "rom_sha256": "307fe1fe11b821116cdabd7bf49722716be4005494b8ecd40210fa70eb366e4a",
-    "matches_milestone_4": true
+    "baseline_milestone_4_sha256": "307fe1fe11b821116cdabd7bf49722716be4005494b8ecd40210fa70eb366e4a",
+    "baseline_matches_milestone_4": true,
+    "rom_sha256": "5a64fde700f014e21dfe81d53d83513a3c1192a12db934b0b3c5d406d1ca0847",
+    "input_module_integrated": true
   },
   "host": {
     "compiler": "gcc 13.3.0",

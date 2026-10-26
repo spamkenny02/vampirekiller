@@ -109,6 +109,11 @@ pas le fichier MSX dans le checkout.
 
 ## Compiler
 
+Les routines de l'archive `start.zip` sont prises en compte : lecture de
+manette dans `sgdk/src/input.c`, commandes transmises a la physique existante.
+Les adaptations de physique, de virgule fixe et de ressources sont detaillees
+dans [research/start-environment.md](research/start-environment.md).
+
 Le code du portage est en C99, compile avec **GCC pour Motorola 68000**
 (`m68k-elf-gcc`). Le Makefile fixe explicitement `-std=c99`.
 GCC natif (x86/ARM) permet de tester les primitives du personnage ; la ROM
@@ -131,7 +136,8 @@ make GDK=/chemin/vers/sgdk EXTRA_FLAGS='-std=c99 -Werror'
 Validation : compilation complete GCC m68k-elf 13.1.0 / SGDK 2.11 en C99
 avec `-Wall -Wextra -Werror`, et primitives compilees avec GCC natif 13.3.0
 en `-std=c99 -pedantic-errors -Wall -Wextra -Werror`. Les 53 872 comparaisons
-C/Z80 passent ; la ROM obtenue est identique au binaire du jalon 4.
+C/Z80 passent. Apres integration du module de commandes de `start.zip`,
+les tests de parcours, de deplacement et des 152 fonds passent egalement.
 
 La sortie est `sgdk/out/rom.bin`. Sous Windows, on peut employer le makefile
 de l'installation SGDK avec les outils fournis dans `bin/`.

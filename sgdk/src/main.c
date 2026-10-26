@@ -1,4 +1,5 @@
 #include <genesis.h>
+#include "input.h"
 #include "generated/rooms.h"
 #include "player.h"
 #include "generated/player_assets.h"
@@ -168,7 +169,7 @@ static void logo_palette(u16 level)
 
 int main(bool hardReset)
 {
-    u16 previous = 0;
+    VKInput input = {0};
     u16 stage = 1;
     u16 room = 0;
     bool atlas = FALSE;
@@ -182,11 +183,11 @@ int main(bool hardReset)
     logo_palette(0);
     while (TRUE)
     {
-        u16 keys, pressed;
+        u16 pressed;
         bool dirty = FALSE;
         SYS_doVBlankProcess();
-        keys = JOY_readJoypad(JOY_1);
-        pressed = keys & ~previous;
+        handleInput(&input);
+        pressed = input.pressed;
         if (front_mode == FRONT_LOGO)
         {
             front_timer++;
@@ -210,7 +211,7 @@ int main(bool hardReset)
         }
         else if (front_mode == FRONT_COURTYARD || front_mode == FRONT_INTERIOR)
         {
-            const int direction = !!(keys & BUTTON_RIGHT) - !!(keys & BUTTON_LEFT);
+            const int direction = input.direction;
             if (pressed & BUTTON_START) show_title();
             else if (front_mode == FRONT_COURTYARD && courtyard_room == 2 &&
                      player.x >= 192 && player.mode == 0 && (pressed & BUTTON_UP))
@@ -219,8 +220,8 @@ int main(bool hardReset)
             {
                 if (front_mode == FRONT_COURTYARD)
                     vk_player_tick_map(&player, vk_courtyard_maps[courtyard_room], 0,
-                                        direction, !!(pressed & BUTTON_C));
-                else vk_player_tick(&player, direction, !!(pressed & BUTTON_C));
+                                        direction, input.jump_pressed);
+                else vk_player_tick(&player, direction, input.jump_pressed);
                 if (front_mode == FRONT_COURTYARD && direction > 0 && player.x == 248 &&
                     vk_courtyard_neighbors[courtyard_room][3] != 255)
                     show_courtyard(vk_courtyard_neighbors[courtyard_room][3], 10);
@@ -237,8 +238,8 @@ int main(bool hardReset)
             else if (pressed & BUTTON_START) enter_play(&player);
             else
             {
-                const int direction = !!(keys & BUTTON_RIGHT) - !!(keys & BUTTON_LEFT);
-                vk_player_tick(&player, direction, !!(pressed & BUTTON_C));
+                const int direction = input.direction;
+                vk_player_tick(&player, direction, input.jump_pressed);
                 show_player(&player);
             }
         }
@@ -261,7 +262,6 @@ int main(bool hardReset)
                 if (dirty) show_room(stage, room, atlas);
             }
         }
-        previous = keys;
     }
     return 0;
 }
