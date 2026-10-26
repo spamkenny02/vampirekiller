@@ -31,6 +31,20 @@ def main():
     parser.add_argument('symbols', type=Path)
     args = parser.parse_args()
     data = load_rom(args.source_rom)
+    # Regression for the faulty routine adapters: HMMV consumes HL and returns
+    # HL=the original BC. Its caller uses that result to draw the blue frame.
+    probe = IntroHarness(data)
+    probe.cpu.hl, probe.cpu.bc, probe.cpu.d, probe.cpu.a = 0x1020, 0x0802, 0, 0xFF
+    probe.call(0x490A)
+    assert probe.cpu.hl == 0x0802 and probe.cpu.a == 0xC0
+    assert all(probe.pixel(x, y) == 15 for y in range(32, 34) for x in range(16, 24))
+    probe.call(0x4B59); probe.call(0x4D47)
+    assert probe.pixel(16, 40) == 15 and probe.palette[15] == (0, 0, 7)
+    assert probe.pixel(6, 24) == 0  # Black perforation in the blue film frame.
+    # Palette writes must reach both the VDP palette port and the VRAM mirror.
+    for i, (r, g, b) in enumerate(probe.palette):
+        rb, green = probe.vram[0xF680 + i * 2:0xF682 + i * 2]
+        assert (r, g, b) == ((rb >> 4) & 7, green & 7, rb & 7)
     symbols = {name: int(address, 16) & 65535 for address, name in
                re.findall(r'^([0-9a-f]+) [bB] (front_mode|front_timer|courtyard_room|player)$',
                           args.symbols.read_text(), re.M)}
@@ -119,7 +133,9 @@ def main():
               'flow': ['logo', 'title', 'animated castle scene', 'courtyard 0', 'courtyard 1',
                        'courtyard 2', 'castle interior'],
               'pixel_comparisons': comparisons, 'castle_matches': matched, 'states': states,
-              'reference_scope': 'Bounded original Z80 routines with explicit BIOS/VDP adapters; not full MSX emulation.',
+              'reference_scope': 'Original Z80 palette and command routines executed through VDP ports; synchronous drawing, not full MSX emulation.',
+              'graphics_regressions': ['HMMV register side effects', 'blue title frame index 15',
+                                       'black frame perforation', 'VDP palette matches VRAM mirror'],
               'limits': ['silent', 'no enemies/attack', 'static courtyard flames', 'simplified door activation']}
     (output / 'intro-checks.json').write_text(json.dumps(report, indent=2) + '\n')
     print(json.dumps({k: v for k, v in report.items() if k != 'states'}, indent=2))

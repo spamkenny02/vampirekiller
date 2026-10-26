@@ -15,6 +15,8 @@ class IntroHarness:
         self.regs = bytearray(64)
         self.address = 0
         self.latch = None
+        self.palette_latch = None
+        self.transfer = None
         self.draw_calls = Counter()
         self.bios_calls = Counter()
         for bank in range(4):
@@ -22,14 +24,11 @@ class IntroHarness:
         self.cpu.set_write_callback(self.mapper_write)
         self.cpu.mark_addrs(0x6000, 0x6000, self.cpu.WRITE_MARK)
         self.cpu.set_output_callback(self.output)
-        self.cpu.set_input_callback(lambda port: 0)
+        self.cpu.set_input_callback(self.input)
         self.cpu.memory[6] = self.cpu.memory[7] = 0x98
         self.cpu.memory[0x2B] = 1  # International BIOS variant.
         self.hooks = {0x0047: self.bios_vdp, 0x005F: self.bios_mode,
                       0x0062: lambda: None, 0x0093: lambda: None,
-                      0x4814: self.set_palette, 0x484C: self.wait_vdp,
-                      0x490A: self.fill, 0x4946: self.copy,
-                      0x498A: self.cpu_copy, 0x49DB: self.logical_copy,
                       0x509F: lambda: None}
         for address in (*self.hooks, 0x0100):
             self.cpu.set_breakpoint(address)
@@ -57,14 +56,18 @@ class IntroHarness:
         self.register(2, 0x1F)
         self.register(1, 0x60)
 
-    def set_palette(self):
-        c = self.cpu
-        self.palette[c.a & 15] = ((c.d >> 4) & 7, c.e & 7, c.d & 7)
-        c.memory[0xF680 + c.a * 2] = c.d
-        c.memory[0xF681 + c.a * 2] = c.e
+    def input(self, port):
+        if port & 255 == 0x99:
+            self.latch = None
+            return 0x81 if self.regs[15] == 2 and self.transfer is not None else 0
+        return 0
 
-    def wait_vdp(self):
-        self.cpu.a = self.cpu.f = 0
+    def transfer_byte(self, value):
+        x, y, width, height, offset = self.transfer
+        self.put(x + offset % width, y + offset // width, value >> 4)
+        self.put(x + offset % width + 1, y + offset // width, value & 15)
+        offset += 2
+        self.transfer = (x, y, width, height, offset) if offset < width * height else None
 
     def output(self, port, value):
         port &= 255
@@ -80,9 +83,19 @@ class IntroHarness:
                 else:
                     self.address = ((self.regs[14] & 7) << 14) | ((value & 63) << 8) | self.latch
                 self.latch = None
+        elif port == 0x9A:
+            if self.palette_latch is None:
+                self.palette_latch = value
+            else:
+                rb = self.palette_latch
+                self.palette[self.regs[16] & 15] = ((rb >> 4) & 7, value & 7, rb & 7)
+                self.regs[16] = (self.regs[16] + 1) & 15
+                self.palette_latch = None
         elif port == 0x9B:
             register = self.regs[17] & 63
             self.register(register, value)
+            if register == 44 and self.transfer is not None:
+                self.transfer_byte(value)
             if not self.regs[17] & 128:
                 self.regs[17] = (register + 1) & 63
             if register == 46:
@@ -91,6 +104,32 @@ class IntroHarness:
             raise ValueError(f'Unadapted VDP output port {port:02X}')
 
     def command(self, value):
+        r = self.regs
+        sx, sy = r[32] | ((r[33] & 1) << 8), r[34] | ((r[35] & 3) << 8)
+        dx, dy = r[36] | ((r[37] & 1) << 8), r[38] | ((r[39] & 3) << 8)
+        width, height = r[40] | ((r[41] & 1) << 8), r[42] | ((r[43] & 3) << 8)
+        if value == 0xF0:
+            if r[45] & 12:
+                raise ValueError('Reverse HMMC transfer is not implemented')
+            self.draw_calls['HMMC'] += 1
+            self.transfer = (dx & 254, dy, (width or 512) & ~1, height or 1024, 0)
+            self.transfer_byte(r[44])
+            return
+        if value in (0xC0, 0xD0, 0x90, 0x98):
+            if r[45] & 12:
+                raise ValueError('Reverse command directions need an explicit adapter')
+            width, height = width or 512, height or 1024
+            if value == 0xC0:
+                self.draw_calls['HMMV'] += 1
+                for y in range(dy, min(dy + height, 1024)):
+                    for x in range(dx & 254, min((dx & 254) + (width & ~1), 256)):
+                        self.put(x, y, r[44] & 15 if x & 1 else r[44] >> 4)
+            else:
+                self.draw_calls['HMMM' if value == 0xD0 else 'LMMM'] += 1
+                if value == 0xD0:
+                    sx, dx, width = sx & 254, dx & 254, width & ~1
+                self.blit(sx, sy, dx, dy, width, height, value == 0x98)
+            return
         if value != 0x70:
             raise ValueError(f'Unadapted VDP command {value:02X}')
         self.draw_calls['LINE'] += 1
@@ -115,51 +154,12 @@ class IntroHarness:
         value = self.vram[address]
         self.vram[address] = (value & 0xF0) | color if x & 1 else (value & 15) | (color << 4)
 
-    def fill(self):
-        c = self.cpu
-        self.draw_calls['HMMV'] += 1
-        x, y = c.h & 254, c.l + c.d * 256
-        width, height = (c.b or 256) & 254, c.c or 256
-        for yy in range(y, min(y + height, 1024)):
-            for xx in range(x, min(x + width, 256)):
-                self.put(xx, yy, c.a & 15 if xx & 1 else c.a >> 4)
-
     def blit(self, sx, sy, dx, dy, width, height, transparent=False):
         pixels = [[self.pixel(sx + x, sy + y) for x in range(width)] for y in range(height)]
         for y, row in enumerate(pixels):
             for x, color in enumerate(row):
                 if color or not transparent:
                     self.put(dx + x, dy + y, color)
-
-    def copy(self):
-        c = self.cpu
-        self.draw_calls['HMMM'] += 1
-        self.blit(c.h & 254, c.l + (c.a & 3) * 256,
-                  c.d & 254, c.e + ((c.a >> 2) & 3) * 256,
-                  (c.b or 256) & 254, c.c or 256)
-
-    def logical_copy(self):
-        c = self.cpu
-        op = c.a & 15
-        if op not in (0, 8):
-            raise ValueError(f'Unadapted LMMM operation {op}')
-        self.draw_calls['LMMM'] += 1
-        self.blit(c.h, c.l + ((c.a >> 6) & 3) * 256,
-                  c.d, c.e + ((c.a >> 4) & 3) * 256,
-                  c.b or 256, c.c or 256, op == 8)
-
-    def cpu_copy(self):
-        c = self.cpu
-        self.draw_calls['HMMC'] += 1
-        x, y, width, height = c.d & 254, c.e + c.a * 256, c.b or 256, c.c or 256
-        address = c.hl
-        for yy in range(height):
-            for xx in range(0, width & 254, 2):
-                value = c.memory[address]
-                address = (address + 1) & 65535
-                self.put(x + xx, y + yy, value >> 4)
-                self.put(x + xx + 1, y + yy, value & 15)
-        c.hl = address
 
     def call(self, address, budget=5000000):
         c = self.cpu

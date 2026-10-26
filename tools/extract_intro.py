@@ -181,7 +181,7 @@ extern const unsigned char vk_courtyard_neighbors[3][4];
                 'courtyard_neighbors': neighbors,
                 'courtyard_collision_maps': maps,
                 'castle_hero_x': [frames[0][6][0], frames[240][6][0], frames[319][6][0]],
-                'reconstruction': 'Original scene/entity routines with synchronous graphics adapters; no full MSX BIOS/timing/audio.',
+                'reconstruction': 'Original scene/entity/palette/command routines with synchronous VDP port adapters; no full MSX BIOS/timing/audio.',
                 'frontend_adaptations': ['Konami fade duration', 'PRESS START replaces PUSH SPACE KEY',
                                          'courtyard flames are static', 'door activation is simplified']}
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')

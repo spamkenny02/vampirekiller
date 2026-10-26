@@ -9,6 +9,12 @@ Les attaques, les ennemis, le son et les escaliers ne sont pas encore portes.
 Les flammes des nouveaux decors sont statiques et ne blessent pas Simon.
 Le controleur et l'activation de la porte sont encore simplifies.
 
+Correction du demarrage : le cadre bleu du titre et le HUD de l'intro ont
+ete reconstruits en executant les routines Z80 de dessin et de palette
+jusqu'aux ports VDP. Les anciennes substitutions oubliaient leurs effets
+sur les registres CPU. Les references et la ROM ont ete regenerees ; des
+controles specifiques protegent maintenant le bleu du titre et les palettes.
+
 ## Essayer
 
 Ouvrir `build/vampire-killer-md-viewer.bin` dans un emulateur Mega Drive.

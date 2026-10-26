@@ -24,10 +24,42 @@ par les ports adaptes 98/99. Les appels BIOS et certaines operations VDP sont
 remplaces explicitement par des operations synchrones sur une VRAM logicielle :
 
 - WRTVDP et CHGMOD pour la configuration video;
-- 4814 pour les changements de palette;
-- HMMV, HMMM, LMMM et HMMC pour les transferts graphiques;
+- ports 99/9A pour les registres VDP et les changements de palette;
+- commandes HMMV, HMMM, LMMM et HMMC pour les transferts graphiques;
 - LINE pour les contours horizontaux et verticaux;
-- attente VDP terminee immediatement et appels sonores ignores.
+- statut VDP adapte aux transferts synchrones et appels sonores ignores.
+
+Les routines Z80 `4814`, `490A`, `4946`, `498A`, `49DB` et les attentes
+VDP sont maintenant executees integralement. Seul le materiel qu'elles
+pilotent est adapte. HMMC consomme le premier octet du registre 44 puis les
+octets suivants via le port indirect, avec CE/TR tant que le transfert reste
+actif. Les couleurs sont ecrites par le port palette 9A et la routine
+originale met elle-meme a jour le miroir VRAM F680.
+
+## Correction des couleurs du demarrage
+
+L'ancienne reconstruction remplacait les routines de dessin par des fonctions
+qui ne reproduisaient pas leurs effets sur les registres CPU. En particulier,
+`490A` ne preserve pas HL : apres le remplissage, HL contient la valeur
+initiale de BC et A vaut C0. L'adaptateur conservait les anciens registres.
+Les appels suivants construisaient donc un cadre errone : le fond bleu du
+titre etait efface et ses perforations grises restaient seules visibles.
+Des elements du HUD etaient egalement mal reconstruits.
+
+Les references PNG et les ressources C ont ete regenerees apres suppression
+de ces raccourcis. Un controle de regression verifie les registres de retour
+de HMMV, le pixel bleu du titre (indice 15, palette RGB333 0/0/7), une
+perforation noire et la correspondance entre palette VDP et miroir VRAM.
+La presentation a aussi ete confrontee visuellement a une planche externe :
+https://www.spriters-resource.com/msx2/vampirekiller/asset/5439/ . Cette
+planche sert de controle visuel independant, pas de ressource du portage ni
+de preuve d'une execution MSX2 complete.
+
+Les anciennes comparaisons MD/reference pouvaient passer avec une reference
+fausse ; elles ne suffisaient donc pas a valider cette reconstruction.
+La correspondance RGB333 vers CRAM Mega Drive reste directe. Les niveaux
+analogiques et le rendu RGB565 d'un emulateur peuvent differer legerement
+d'une capture MSX2 : aucune correction arbitraire de teinte n'est appliquee.
 
 Ce n'est pas une machine MSX2 complete. Les delais BIOS, le temps d'execution
 des commandes VDP, les interruptions et le son ne sont pas reproduits.
